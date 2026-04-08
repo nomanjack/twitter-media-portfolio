@@ -74,6 +74,10 @@ Claude will configure everything, sync your posts, and start the preview.
 - DOM pooling (~500 elements) for smooth virtualized rendering
 - Twitter GraphQL API with Chrome cookie auth
 
+## Credits
+
+Built on top of [@daniel__designs](https://twitter.com/daniel__designs)' [twitter-bookmarks-grid](https://github.com/danieldestefanis/twitter-bookmarks-grid) — the core infinite tiling engine, DOM pooling, and layout system come from his work.
+
 ## License
 
 MIT
