@@ -1,0 +1,16 @@
+{
+  "name": "twitter-media-portfolio",
+  "version": "1.0.0",
+  "description": "Turn your Twitter media tab into a visual portfolio",
+  "main": "app.js",
+  "scripts": {
+    "sync": "node sync-media.js",
+    "start": "node server.js"
+  },
+  "keywords": ["twitter", "portfolio", "media", "grid"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "motion": "^12.38.0"
+  }
+}

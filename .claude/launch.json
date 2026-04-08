@@ -1,0 +1,15 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Portfolio Dev",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["server.js"],
+      "port": 3001,
+      "cwd": "/Users/macbook/Downloads/twitter-media-portfolio",
+      "env": {
+        "PORT": "3001"
+      }
+    }
+  ]
+}
