@@ -48,6 +48,16 @@ body {
   cursor: grabbing;
 }
 
+body.layout-grid #viewport,
+body.layout-feed #viewport {
+  cursor: default;
+}
+
+body.layout-grid #viewport.grabbing,
+body.layout-feed #viewport.grabbing {
+  cursor: ns-resize;
+}
+
 #container {
   position: absolute;
   inset: 0;
@@ -131,24 +141,23 @@ body {
 
 .grid-item-video-badge {
   position: absolute;
-  bottom: 8px;
-  left: 8px;
-  width: 28px;
-  height: 28px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 50%;
   pointer-events: none;
-  backdrop-filter: blur(4px);
 }
 
 .grid-item-video-badge svg {
-  width: 14px;
-  height: 14px;
+  width: 36px;
+  height: 36px;
   fill: #fff;
-  opacity: 0.9;
+  opacity: 0.85;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
 }
 
 /* --- Profile Header --- */
@@ -292,11 +301,24 @@ body.lightbox-open .toolbar {
 .edit-counter {
   font-size: 11px;
   color: var(--control-text-muted);
-  padding: 0 8px 0 4px;
   white-space: nowrap;
   user-select: none;
   pointer-events: none;
   font-variant-numeric: tabular-nums;
+  display: inline-block;
+  overflow: hidden;
+  max-width: 0;
+  padding: 0;
+  opacity: 0;
+  transition: max-width 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              padding 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              opacity 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.edit-counter.visible {
+  max-width: 60px;
+  padding: 0 8px 0 4px;
+  opacity: 1;
 }
 
 /* --- Lightbox --- */
@@ -367,6 +389,7 @@ body.lightbox-open .toolbar {
   max-width: 640px;
   line-height: 1.4;
   color: rgba(255, 255, 255, 0.7);
+  text-wrap: pretty;
 }
 
 .lightbox-view-btn {

@@ -108,7 +108,19 @@ const buildMasonryLayout = () => {
     colHeights[minCol] += itemH + gap;
   }
 
-  maxColHeight = Math.max(...colHeights, 1);
+  maxColHeight = Math.ceil(Math.max(...colHeights, 1));
+
+  // Equalize column heights for seamless vertical tiling:
+  // Distribute extra vertical space evenly within shorter columns
+  for (let col = 0; col < GRID_CONFIG.COLS; col++) {
+    const colItems = columns[col];
+    if (colItems.length <= 1 || colHeights[col] >= maxColHeight) continue;
+    const deficit = maxColHeight - colHeights[col];
+    const extraPerItem = deficit / colItems.length;
+    for (let i = 0; i < colItems.length; i++) {
+      colItems[i].y += extraPerItem * i;
+    }
+  }
 
   layoutItems = [];
   for (let col = 0; col < GRID_CONFIG.COLS; col++) {
@@ -151,7 +163,24 @@ const buildGridLayout = () => {
     colHeights[col] += itemH + gap;
   }
 
-  maxColHeight = Math.max(...colHeights, 1);
+  maxColHeight = Math.ceil(Math.max(...colHeights, 1));
+
+  // Equalize column heights for seamless vertical tiling
+  const colItemsMap = new Map();
+  for (const item of layoutItems) {
+    const col = parseInt(item.key.split("-")[0]);
+    if (!colItemsMap.has(col)) colItemsMap.set(col, []);
+    colItemsMap.get(col).push(item);
+  }
+  for (let col = 0; col < cols; col++) {
+    const items = colItemsMap.get(col) || [];
+    if (items.length <= 1 || colHeights[col] >= maxColHeight) continue;
+    const deficit = maxColHeight - colHeights[col];
+    const extraPerItem = deficit / items.length;
+    for (let i = 0; i < items.length; i++) {
+      items[i].y += extraPerItem * i;
+    }
+  }
 };
 
 const buildFeedLayout = () => {
@@ -201,7 +230,7 @@ const createPool = () => {
     const el = document.createElement("div");
     el.className = "grid-item";
     el.style.display = "none";
-    el.innerHTML = `<img src="" alt="" loading="lazy" decoding="async"><div class="grid-item-video-badge" style="display:none"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="grid-item-hidden-overlay"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg></div>`;
+    el.innerHTML = `<img src="" alt="" loading="lazy" decoding="async"><div class="grid-item-video-badge" style="display:none"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM10.7817 8.78296C10.4498 8.55666 10 8.79436 10 9.19607V14.8039C10 15.2056 10.4498 15.4433 10.7817 15.217L14.8941 12.4131C15.1852 12.2146 15.1852 11.7854 14.8941 11.5869L10.7817 8.78296Z" fill="currentColor"/></svg></div><div class="grid-item-hidden-overlay"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg></div>`;
     grid.appendChild(el);
     pool.push(el);
     freePool.push(el);
@@ -640,6 +669,10 @@ const applyLayout = (layout) => {
   isTransitioning = true;
   activeLayout = layout;
 
+  // Update body class for cursor styling
+  document.body.classList.remove("layout-masonry", "layout-grid", "layout-feed");
+  document.body.classList.add(`layout-${layout}`);
+
   grid.style.transition = "opacity 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)";
   grid.style.opacity = "0";
 
@@ -701,7 +734,6 @@ const createEditToggle = () => {
   const counter = document.createElement("span");
   counter.id = "edit-counter";
   counter.className = "edit-counter";
-  counter.style.display = "none";
 
   wrapper.appendChild(btn);
   wrapper.appendChild(counter);
@@ -709,7 +741,7 @@ const createEditToggle = () => {
   btn.addEventListener("click", () => {
     editMode = !editMode;
     btn.classList.toggle("active", editMode);
-    counter.style.display = editMode ? "" : "none";
+    counter.classList.toggle("visible", editMode);
     document.body.classList.toggle("edit-mode", editMode);
 
     // Trigger grow animation by removing and re-adding class
@@ -827,6 +859,7 @@ const init = async () => {
     document.title = `@${CONFIG?.handle || PROFILE.name} — Portfolio`;
   }
 
+  document.body.classList.add(`layout-${activeLayout}`);
   buildLayout();
   createPool();
   renderVisibleItems();
