@@ -76,7 +76,7 @@ Claude will configure everything, sync your posts, and start the preview.
 
 ## Credits
 
-Built on top of [@daniel__designs](https://twitter.com/daniel__designs)' [twitter-bookmarks-grid](https://github.com/danieldestefanis/twitter-bookmarks-grid) — the core infinite tiling engine, DOM pooling, and layout system come from his work.
+Built on top of [@daniel__designs](https://twitter.com/daniel__designs)' twitter-bookmarks-grid.
 
 ## License
 
