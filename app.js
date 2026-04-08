@@ -201,7 +201,7 @@ const createPool = () => {
     const el = document.createElement("div");
     el.className = "grid-item";
     el.style.display = "none";
-    el.innerHTML = `<img src="" alt="" loading="lazy" decoding="async"><div class="grid-item-hidden-overlay"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg></div>`;
+    el.innerHTML = `<img src="" alt="" loading="lazy" decoding="async"><div class="grid-item-video-badge" style="display:none"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="grid-item-hidden-overlay"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg></div>`;
     grid.appendChild(el);
     pool.push(el);
     freePool.push(el);
@@ -219,6 +219,8 @@ const releaseElement = (el) => {
   el.style.display = "none";
   el.style.visibility = "";
   el.classList.remove("hidden-post");
+  const badge = el.querySelector(".grid-item-video-badge");
+  if (badge) badge.style.display = "none";
   freePool.push(el);
 };
 
@@ -310,6 +312,12 @@ const renderVisibleItems = () => {
             img.alt = item.post.text.substring(0, 60);
           }
 
+          // Show/hide video badge
+          const videoBadge = el.querySelector(".grid-item-video-badge");
+          if (videoBadge) {
+            videoBadge.style.display = item.post.images[0].type === "video" ? "" : "none";
+          }
+
           el.style.width = `${item.w}px`;
           el.style.height = `${item.h}px`;
           el.style.transform = `translate3d(${sx}px, ${sy}px, 0)`;
@@ -398,10 +406,13 @@ const openLightbox = (el, post) => {
   document.body.appendChild(lightboxClone);
 
   overlay.classList.add("active");
+  document.body.classList.add("lightbox-open");
 
-  // Set lightbox info — no transition animations, just show immediately
+  // Set lightbox info
   if (post) {
-    const caption = post.text.trim();
+    // Strip t.co links from caption
+    const isVideo = post.images && post.images[0] && post.images[0].type === "video";
+    let caption = post.text.trim().replace(/https?:\/\/t\.co\/\w+/g, "").trim();
     if (caption) {
       lightboxTitle.textContent = caption.length > 120 ? caption.substring(0, 120) + "\u2026" : caption;
       lightboxTitle.style.display = "";
@@ -410,7 +421,7 @@ const openLightbox = (el, post) => {
       lightboxTitle.style.display = "none";
     }
     lightboxLink.href = post.url;
-    lightboxLink.textContent = "View on Twitter";
+    lightboxLink.textContent = isVideo ? "Watch video on Twitter" : "View on Twitter";
   }
 
   const lightboxInfo = document.getElementById("lightbox-info");
@@ -449,6 +460,7 @@ const closeLightbox = () => {
   const { element: el } = state.lightboxItem;
 
   overlay.classList.remove("active");
+  document.body.classList.remove("lightbox-open");
 
   const originalRect = el.getBoundingClientRect();
   const endX = originalRect.left;

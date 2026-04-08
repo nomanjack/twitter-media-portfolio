@@ -50,7 +50,7 @@ body {
 
 #container {
   position: absolute;
-  inset: -10vmin;
+  inset: 0;
   width: 100%;
   height: 100%;
 }
@@ -127,6 +127,30 @@ body {
   }
 }
 
+/* --- Video badge on grid items --- */
+
+.grid-item-video-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+}
+
+.grid-item-video-badge svg {
+  width: 14px;
+  height: 14px;
+  fill: #fff;
+  opacity: 0.9;
+}
+
 /* --- Profile Header --- */
 
 .profile-header {
@@ -143,7 +167,8 @@ body {
   background: var(--control-bg);
   border: none;
   border-radius: 100px;
-  transition: background 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: background 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              opacity 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -177,6 +202,14 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  transition: opacity 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Fade controls when lightbox is open */
+body.lightbox-open .profile-header,
+body.lightbox-open .toolbar {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .toolbar-group {
